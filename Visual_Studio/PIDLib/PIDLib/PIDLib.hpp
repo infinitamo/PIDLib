@@ -51,7 +51,8 @@ public:
     ~PIDLib_PID();
     
     void init(PIDLib_PIDSetupType& setupIn);
-    float run(float& setpoint, PIDLib_MeasurementType& measIn);
+    void setpoint(float& setpoint);
+    float run(PIDLib_MeasurementType& measIn);
 
 private:
     bool          m_firstPass;
@@ -151,11 +152,15 @@ void PIDLib_PID::init(PIDLib_PIDSetupType& setupIn)
     return;
 }
 
-float PIDLib_PID::run(float& setpoint, PIDLib_MeasurementType& measIn)
+void PIDLib_PID::setpoint(float& setpoint)
 {
-    // Read setpoint command
     m_setpoint = setpoint;
 
+    return;
+}
+
+float PIDLib_PID::run(PIDLib_MeasurementType& measIn)
+{
     // Read measurement information
     m_measTime_usec = measIn.time_usec;
     m_measValue     = measIn.value;

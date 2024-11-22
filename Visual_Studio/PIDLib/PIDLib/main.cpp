@@ -29,14 +29,16 @@ int main()
     float setpoint = 5.0f;
 
     float output{};
+
+    myPID.setpoint(setpoint);
     
     myMeas.time_usec = 1000;
     myMeas.value     = 3.14f;
-    output = myPID.run(setpoint, myMeas); // test 1st pass
+    output = myPID.run(myMeas); // test 1st pass
 
     myMeas.time_usec = 2000;
     myMeas.value     = 3.5f;
-    output = myPID.run(setpoint, myMeas); // test 2nd pass
+    output = myPID.run(myMeas); // test 2nd pass
 
     return 0;
 }
