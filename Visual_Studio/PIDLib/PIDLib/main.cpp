@@ -30,12 +30,12 @@ int main()
 
     float output{};
     
-    myMeas.time_sec = 0.1f;
-    myMeas.value    = 3.14f;
+    myMeas.time_usec = 1000;
+    myMeas.value     = 3.14f;
     output = myPID.run(setpoint, myMeas); // test 1st pass
 
-    myMeas.time_sec = 0.2f;
-    myMeas.value    = 3.5f;
+    myMeas.time_usec = 2000;
+    myMeas.value     = 3.5f;
     output = myPID.run(setpoint, myMeas); // test 2nd pass
 
     return 0;
