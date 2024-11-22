@@ -1,18 +1,23 @@
 #ifndef PID_LIB_HPP
 #define PID_LIB_HPP
 
+namespace PIDLib_Const
+{
+    float USEC_2_SEC = 1.0e-6f;
+}
+
 //
 // Measurement Type Struct
 //
 struct PIDLib_MeasurementType
 {
     PIDLib_MeasurementType() :
-        time_sec( 0.0f ),
+        time_usec( 0 ),
         value( 0.0f )
     {};
 
-    float time_sec; // time of measurement in seconds
-    float value;    // value of the measurement
+    unsigned long time_usec;  // time of measurement in micro seconds
+    float         value;      // value of the measurement
 };
 
 //
@@ -49,80 +54,83 @@ public:
     float run(float& setpoint, PIDLib_MeasurementType& measIn);
 
 private:
-    bool  m_firstPass;
-    bool  m_antiwindupStatus;
-    float m_myTime_sec;
-    float m_valueP;
-    float m_valueI;
-    float m_valueD;
-    float m_gainP;
-    float m_gainI;
-    float m_gainD;
-    float m_outputLowerLimit;
-    float m_outputUpperLimit;
-    float m_outputUnlimited;
-    float m_outputLimited;
-    float m_setpoint;
-    float m_errorPrevious;
-    float m_error;
-    float m_errorIntegral;
-    float m_errorDerivative;
-    float m_timeDelta_sec;
-    float m_measTime_sec;
-    float m_measValue;
+    bool          m_firstPass;
+    bool          m_antiwindupStatus;
+    float         m_valueP;
+    float         m_valueI;
+    float         m_valueD;
+    float         m_gainP;
+    float         m_gainI;
+    float         m_gainD;
+    float         m_outputLowerLimit;
+    float         m_outputUpperLimit;
+    float         m_outputUnlimited;
+    float         m_outputLimited;
+    float         m_setpoint;
+    float         m_errorPrevious;
+    float         m_error;
+    float         m_errorIntegral;
+    float         m_errorDerivative;
+    float         m_timeDelta_sec;
+    float         m_measValuePrev;
+    float         m_measValue;
+    unsigned long m_measTime_usec;
+    unsigned long m_myTime_usec;
 };
 
 PIDLib_PID::PIDLib_PID()
 {
-    m_firstPass          = true;
-    m_antiwindupStatus   = false;
-    m_myTime_sec         = 0.0f;
-    m_valueP             = 0.0f;
-    m_valueI             = 0.0f;
-    m_valueD             = 0.0f;
-    m_gainP              = 0.0f;
-    m_gainI              = 0.0f;
-    m_gainD              = 0.0f;
-    m_outputLowerLimit   = 0.0f;
-    m_outputUpperLimit   = 0.0f;
-    m_outputUnlimited    = 0.0f;
-    m_outputLimited      = 0.0f;
-    m_setpoint           = 0.0f;
-    m_errorPrevious      = 0.0f;
-    m_error              = 0.0f;
-    m_errorIntegral      = 0.0f;
-    m_errorDerivative    = 0.0f;
-    m_timeDelta_sec      = 0.0f;
-    m_measTime_sec       = 0.0f;
-    m_measValue          = 0.0f;
+    m_firstPass        = true;
+    m_antiwindupStatus = false;
+    m_valueP           = 0.0f;
+    m_valueI           = 0.0f;
+    m_valueD           = 0.0f;
+    m_gainP            = 0.0f;
+    m_gainI            = 0.0f;
+    m_gainD            = 0.0f;
+    m_outputLowerLimit = 0.0f;
+    m_outputUpperLimit = 0.0f;
+    m_outputUnlimited  = 0.0f;
+    m_outputLimited    = 0.0f;
+    m_setpoint         = 0.0f;
+    m_errorPrevious    = 0.0f;
+    m_error            = 0.0f;
+    m_errorIntegral    = 0.0f;
+    m_errorDerivative  = 0.0f;
+    m_timeDelta_sec    = 0.0f;
+    m_measValuePrev    = 0.0f;
+    m_measValue        = 0.0f;
+    m_measTime_usec    = 0;
+    m_myTime_usec      = 0;
 
     return;
 }
 
 PIDLib_PID::PIDLib_PID(PIDLib_PIDSetupType& setupIn)
 {
-    m_firstPass          = true;
-    m_antiwindupStatus   = false;
-    m_myTime_sec         = 0.0f;
-    m_valueP             = 0.0f;
-    m_valueI             = 0.0f;
-    m_valueD             = 0.0f;
-    m_outputUnlimited    = 0.0f;
-    m_outputLimited      = 0.0f;
-    m_setpoint           = 0.0f;
-    m_errorPrevious      = 0.0f;
-    m_error              = 0.0f;
-    m_errorIntegral      = 0.0f;
-    m_errorDerivative    = 0.0f;
-    m_timeDelta_sec      = 0.0f;
-    m_measTime_sec       = 0.0f;
-    m_measValue          = 0.0f;
+    m_firstPass        = true;
+    m_antiwindupStatus = false;
+    m_valueP           = 0.0f;
+    m_valueI           = 0.0f;
+    m_valueD           = 0.0f;
+    m_outputUnlimited  = 0.0f;
+    m_outputLimited    = 0.0f;
+    m_setpoint         = 0.0f;
+    m_errorPrevious    = 0.0f;
+    m_error            = 0.0f;
+    m_errorIntegral    = 0.0f;
+    m_errorDerivative  = 0.0f;
+    m_timeDelta_sec    = 0.0f;
+    m_measValuePrev    = 0.0f;
+    m_measValue        = 0.0f;
+    m_measTime_usec    = 0;
+    m_myTime_usec      = 0;
 
-    m_gainP             = setupIn.gainP;
-    m_gainI             = setupIn.gainI;
-    m_gainD             = setupIn.gainD;
-    m_outputLowerLimit  = setupIn.outputLowerLimit;
-    m_outputUpperLimit  = setupIn.outputUpperLimit;
+    m_gainP            = setupIn.gainP;
+    m_gainI            = setupIn.gainI;
+    m_gainD            = setupIn.gainD;
+    m_outputLowerLimit = setupIn.outputLowerLimit;
+    m_outputUpperLimit = setupIn.outputUpperLimit;
 
     return;
 }
@@ -149,11 +157,11 @@ float PIDLib_PID::run(float& setpoint, PIDLib_MeasurementType& measIn)
     m_setpoint = setpoint;
 
     // Read measurement information
-    m_measTime_sec = measIn.time_sec;
-    m_measValue    = measIn.value;
+    m_measTime_usec = measIn.time_usec;
+    m_measValue     = measIn.value;
 
     // Compute time delta (from last measurement)
-    m_timeDelta_sec = m_measTime_sec - m_myTime_sec;
+    m_timeDelta_sec = PIDLib_Const::USEC_2_SEC * ((float)(m_measTime_usec - m_myTime_usec));
 
     // Compute setpoint error
     m_error = m_setpoint - m_measValue;
@@ -169,7 +177,7 @@ float PIDLib_PID::run(float& setpoint, PIDLib_MeasurementType& measIn)
     else
     {
         m_errorIntegral += (m_gainI == 0.0f || m_antiwindupStatus == false) ? 0.0f : m_timeDelta_sec * m_error;
-        m_errorDerivative = (m_gainD == 0.0f) ? 0.0f : (m_error - m_errorPrevious) / m_timeDelta_sec;
+        m_errorDerivative = (m_gainD == 0.0f) ? 0.0f : (m_measValue - m_measValuePrev) / m_timeDelta_sec;
     }
 
     // Compute values of proportional, integral, and derivative partitions
@@ -198,8 +206,9 @@ float PIDLib_PID::run(float& setpoint, PIDLib_MeasurementType& measIn)
     }
 
     // Close out run routine
-    m_myTime_sec = m_measTime_sec;
+    m_myTime_usec   = m_measTime_usec;
     m_errorPrevious = m_error;
+    m_measValuePrev = m_measValue;
 
     return m_outputLimited;
 }
