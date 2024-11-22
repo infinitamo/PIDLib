@@ -158,17 +158,19 @@ float PIDLib_PID::run(float& setpoint, PIDLib_MeasurementType& measIn)
     // Compute setpoint error
     m_error = m_setpoint - m_measValue;
 
-    // Compute error integral
+    // Compute integral and derivative
     if (m_firstPass)
-        m_errorIntegral = 0.0f;
-    else
-        m_errorIntegral += (m_gainI == 0.0f || m_antiwindupStatus == false) ? 0.0f : m_timeDelta_sec * m_error;
+    {
+        m_firstPass = false;
 
-    // Compute error derivative
-    if (m_firstPass)
+        m_errorIntegral = 0.0f;
         m_errorDerivative = 0.0f;
+    }
     else
+    {
+        m_errorIntegral += (m_gainI == 0.0f || m_antiwindupStatus == false) ? 0.0f : m_timeDelta_sec * m_error;
         m_errorDerivative = (m_gainD == 0.0f) ? 0.0f : (m_error - m_errorPrevious) / m_timeDelta_sec;
+    }
 
     // Compute values of proportional, integral, and derivative partitions
     m_valueP = m_gainP * m_error;
@@ -198,7 +200,6 @@ float PIDLib_PID::run(float& setpoint, PIDLib_MeasurementType& measIn)
     // Close out run routine
     m_myTime_sec = m_measTime_sec;
     m_errorPrevious = m_error;
-    m_firstPass = false;
 
     return m_outputLimited;
 }
