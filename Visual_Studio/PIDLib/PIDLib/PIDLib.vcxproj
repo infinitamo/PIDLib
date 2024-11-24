@@ -127,7 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="basicExample.cpp" />
+    <ClCompile Include="PIDLib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PIDLib.hpp" />
