@@ -254,7 +254,7 @@ void PIDLib::PID::computePIDTerms()
 
         if (m_derActive)
         {
-            double tol = 1e-12;  // more than enough to account for micro-second precision
+            double tol = 1e-31;  // more than enough to account for micro-second precision
             double dt = m_timeDelta_sec;
             if (fabs(dt) < tol) dt = tol;  // clamp time delta to prevent NaN
 
