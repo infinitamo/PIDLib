@@ -5,13 +5,13 @@
 //  Copyright(c) 2024 infinitamo
 //  
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this softwareand associated documentation files(the "Software"), to deal
+//  of this software and associated documentation files(the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
 //  to use, copy, modify, merge, publish, distribute, sublicense, and /or sell
 //  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions :
 //  
-//  The above copyright noticeand this permission notice shall be included in all
+//  The above copyright notice and this permission notice shall be included in all
 //  copies or substantial portions of the Software.
 //  
 //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -40,6 +40,7 @@
 //! 
 /////////////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>       // C++ standard math library
 #include "PIDLib.hpp"  // PIDLib header file include
 
 //============================================================
@@ -235,10 +236,8 @@ void PIDLib::PID::computePIDTerms()
         {
             if (m_PonX == ONX_MODE::ERROR)
                 m_proTerm = m_error;       // PonE
-
             else if (m_PonX == ONX_MODE::MEASR)
                 m_proTerm = -m_measValue;  // PonM
-
             else
                 m_proTerm = m_error;       // PonE default
         }
@@ -247,24 +246,26 @@ void PIDLib::PID::computePIDTerms()
         {
             if (m_IonX == ONX_MODE::ERROR)
                 m_intTerm += m_error * m_timeDelta_sec;       // IonE
-
             else if (m_IonX == ONX_MODE::MEASR)
                 m_intTerm += -m_measValue * m_timeDelta_sec;  // IonM
-
             else
                 m_intTerm += m_error * m_timeDelta_sec;       // IonE default
         }
 
         if (m_derActive)
         {
-            if (m_DonX == ONX_MODE::MEASR)
-                m_derTerm = -(m_measValue - m_measValuePrev) / m_timeDelta_sec;  // DonM
-            
-            else if (m_DonX == ONX_MODE::ERROR)
-                m_derTerm = (m_error - m_errorPrevious) / m_timeDelta_sec;       // DonE
+            double tol = 1e-12;  // more than enough to account for micro-second precision
+            double dt = m_timeDelta_sec;
+            if (fabs(dt) < tol) dt = tol;  // clamp time delta to prevent NaN
 
+            if (m_DonX == ONX_MODE::MEASR)
+                m_derTerm = -(m_measValue - m_measValuePrev);  // DonM
+            else if (m_DonX == ONX_MODE::ERROR)
+                m_derTerm = (m_error - m_errorPrevious);       // DonE
             else
-                m_derTerm = -(m_measValue - m_measValuePrev) / m_timeDelta_sec;  // DonM default
+                m_derTerm = -(m_measValue - m_measValuePrev);  // DonM default
+
+            m_derTerm /= dt;
         }
     }
     else
